@@ -52,6 +52,117 @@ fn check(tgt: &LineInfo, idx: u32, seen_numbers: &mut HashMap<u32, bool>) -> Opt
     None
 }
 
+fn part2() {
+    let sample_input = r"467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..";
+
+    let sample_input2 = r".....
+1*4..
+..1..
+.....
+.....
+..10.
+1+...
+";
+
+    let real_input = std::fs::read_to_string("input.txt").expect("contents");
+
+    let re = &Regex::new(r"([0-9]+)").expect("a regex");
+    let mut line_no: u32 = 0;
+
+    let mut last_lni: Option<LineInfo> = None;
+    let mut cur_lni: Option<LineInfo> = None;
+    let mut next_lni: Option<LineInfo> = None;
+
+    let mut accum = 0;
+
+    // for l in sample_input.split("\n") {
+    // for l in sample_input2.split("\n") {
+    for l in real_input.split("\n") {
+        // println!("\n----------------------\n");
+        next_lni = Some(LineInfo::from_str(re, line_no, l));
+
+        // println!("last: {:?}\ncur:  {:?}\nnext: {:?}",
+        //     last_lni.as_ref().map(|lni| lni.line_number),
+        //     cur_lni.as_ref().map(|lni| lni.line_number),
+        //     next_lni.as_ref().map(|lni| lni.line_number),
+        // );
+
+        if let Some(ref cur) = cur_lni {
+            // println!("{:?}", cur);
+            for symbol_idx_idx in 0..cur.symbols.len() {
+                let symbol_idx = cur.symbols[symbol_idx_idx];
+                // println!("processing: {}", cur.symbols[symbol_idx_idx]);
+
+                let mut adj_num = vec![];
+
+                if let Some(ref last) = last_lni {
+                    let mut seen_numbers: HashMap<u32, bool> = HashMap::new();
+
+                    if let Some((id, num)) = check(last, symbol_idx - 1, &mut seen_numbers) {
+                        adj_num.push(num);
+                        // println!("Adding ({}, {}) / {}", last.line_number, id, num);
+                    }
+                    if let Some((id, num)) = check(last, symbol_idx, &mut seen_numbers) {
+                        adj_num.push(num);
+                        // println!("Adding ({}, {}) / {}", last.line_number, id, num);
+                    }
+                    if let Some((id, num)) = check(last, symbol_idx + 1, &mut seen_numbers) {
+                        adj_num.push(num);
+                        // println!("Adding ({}, {}) / {}", last.line_number, id, num);
+                    }
+                }
+
+                let mut seen_numbers: HashMap<u32, bool> = HashMap::new();
+                // handle left + right
+                if let Some((id, num)) = check(cur, symbol_idx - 1, &mut seen_numbers) {
+                    adj_num.push(num);
+                    // println!("Adding ({}, {}) / {}", cur.line_number, id, num);
+                }
+                if let Some((id, num)) = check(cur, symbol_idx + 1, &mut seen_numbers) {
+                    adj_num.push(num);
+                    // println!("Adding ({}, {}) / {}", cur.line_number, id, num);
+                }
+
+                if let Some(ref next) = next_lni {
+                    let mut seen_numbers: HashMap<u32, bool> = HashMap::new();
+                    if let Some((id, num)) = check(next, symbol_idx - 1, &mut seen_numbers) {
+                        adj_num.push(num);
+                        // println!("Adding ({}, {}) / {}", next.line_number, id, num);
+                    }
+                    if let Some((id, num)) = check(next, symbol_idx, &mut seen_numbers) {
+                        adj_num.push(num);
+                        // println!("Adding ({}, {}) / {}", next.line_number, id, num);
+                    }
+                    if let Some((id, num)) = check(next, symbol_idx + 1, &mut seen_numbers) {
+                        adj_num.push(num);
+                        // println!("Adding ({}, {}) / {}", next.line_number, id, num);
+                    }
+                }
+            
+                if adj_num.len() == 2 {
+                    accum += (adj_num[0] * adj_num[1]);
+                }
+            }
+        }
+
+        line_no = line_no + 1;
+        last_lni = cur_lni;
+        cur_lni = next_lni;
+    }
+
+    println!("accum: {}", accum);
+}
+
+
 fn part1() {
     let sample_input = r"467..114..
 ...*......
@@ -157,5 +268,5 @@ fn part1() {
 }
 
 fn main() {
-    part1();
+    part2();
 }
