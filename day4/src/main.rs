@@ -119,6 +119,7 @@ fn part2(input: &String) {
     println!("accumulated: {}", accumulated_cards);
     println!("total cards: {}", accumulated_cards + (card_catalog.len() as u32));
 }
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let default_path = String::from("test.txt");
