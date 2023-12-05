@@ -252,14 +252,9 @@ fn part2(input: &String) {
 
     let mut min = None;
 
-    let mut i = 0;
     for (range_start, range) in seeds.iter() {
         let range_stop = *range_start + *range;
         for seed in *range_start..range_stop {
-            i = i + 1;
-            if i % 10000 == 0 {
-                println!("{i}");    
-            }
         let sd = Seed{id: seed};
         let loc = sd.trace(&a);
         // println!("{} -> {}", seed, loc);
